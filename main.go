@@ -15,14 +15,26 @@ type Post struct {
 	Body  string
 }
 
-var db, err = sql.Open("mysql", "root:root@/go_course?charset=utf8")
+var db, err = sql.Open("mysql", "root:fioriferk3@/go_course?charset=utf8")
 
 func main() {
-	stmt, err := db.Prepare("insert into posts(title, body) values(?, ?)")
+	// stmt, err := db.Prepare("insert into posts(title, body) values(?, ?)")
+	// checkErr(err)
+
+	// _, err = stmt.Exec("My first post", "My first content")
+	// checkErr(err)
+
+	rows, err := db.Query("select * from posts")
 	checkErr(err)
 
-	_, err = stmt.Exec("My first post", "My first content")
-	checkErr(err)
+	items := []Post{}
+
+	for rows.Next() {
+		post := Post{}
+
+		rows.Scan(&post.Id, &post.Title, &post.Body)
+		items =  append(items, post)
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		post := Post{Id: 1, Title: "Unamed Post", Body: "No content"}
