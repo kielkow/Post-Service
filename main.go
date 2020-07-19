@@ -31,6 +31,7 @@ func main() {
 
 	r.HandleFunc("/", HomeHandler)
 	r.HandleFunc("/{id}/view", ViewHandler)
+	r.HandleFunc("/addpost/{title}/{body}", AddPost)
 
 	fmt.Println(http.ListenAndServe(":8080", r))
 }
@@ -75,6 +76,16 @@ func GetPostById(id string) *Post {
 	row.Scan(&post.Id, &post.Title, &post.Body)
 
 	return &post
+}
+
+func AddPost(w http.ResponseWriter, r *http.Request) {
+	title := mux.Vars(r)["title"]
+	body := mux.Vars(r)["body"]
+
+	stmt, err := db.Prepare("insert into posts(title, body) values(?, ?)")
+	checkErr(err)
+
+	_, err = stmt.Exec(title, body)
 }
 
 func checkErr(err error) {
