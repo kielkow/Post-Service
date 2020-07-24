@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/kielkow/Post-Service/cors"
 )
 
 const postsBasePath = "posts"
@@ -61,7 +63,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if newPost.ProductID != 0 {
+		if newPost.id != 0 {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -83,7 +85,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 
 func postHandler(w http.ResponseWriter, r *http.Request) {
 	urlPathSegments := strings.Split(r.URL.Path, "posts/")
-	productID, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
+	id, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
 
 	if err != nil {
 		log.Print(err)
@@ -91,7 +93,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := getPost(productID)
+	post, err := getPost(id)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -132,7 +134,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if updatedPost.ProductID != productID {
+		if updatedPost.id != id {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -148,7 +150,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case http.MethodDelete:
-		err = removePost(productID)
+		err = removePost(id)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

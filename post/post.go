@@ -1,7 +1,12 @@
 package post
 
+import "time"
+
 // Post struct
 type Post struct {
-	author      string `json:"author"`
-	description string `json:"description"`
+	id          int       `json:"id"`
+	author      string    `json:"author"`
+	description string    `json:"description"`
+	createdAt   time.Time `json:"createdAt"`
+	updatedAt   time.Time `json:"updatedAt"`
 }

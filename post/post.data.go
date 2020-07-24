@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pluralsight/inventoryservice/database"
+	"github.com/kielkow/Post-Service/database"
 )
 
 func getPost(id int) (*Post, error) {
@@ -115,7 +115,6 @@ func updatePost(post Post) error {
 		WHERE id = ? `,
 		post.author,
 		post.description,
-		post.Name,
 		time.Now(),
 		post.id,
 	)

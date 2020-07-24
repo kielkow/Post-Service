@@ -12,7 +12,7 @@ import (
 
 // ReportFilter struct
 type ReportFilter struct {
-	author    string `json: "author"`
+	author      string `json: "author"`
 	description string `json: "description"`
 }
 
