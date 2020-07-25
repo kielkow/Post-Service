@@ -30,11 +30,11 @@ func getPost(id int) (*Post, error) {
 	post := &Post{}
 
 	err := row.Scan(
-		&post.id,
-		&post.author,
-		&post.description,
-		&post.createdAt,
-		&post.updatedAt,
+		&post.ID,
+		&post.Author,
+		&post.Description,
+		// &post.createdAt,
+		// &post.updatedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -89,11 +89,11 @@ func getPostList() ([]Post, error) {
 		var post Post
 
 		results.Scan(
-			&post.id,
-			&post.author,
-			&post.description,
-			&post.createdAt,
-			&post.updatedAt,
+			&post.ID,
+			&post.Author,
+			&post.Description,
+			// &post.createdAt,
+			// &post.updatedAt,
 		)
 
 		posts = append(posts, post)
@@ -102,7 +102,7 @@ func getPostList() ([]Post, error) {
 	return posts, nil
 }
 
-func updatePost(post Post) error {
+func updatePost(id int, post Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -110,13 +110,11 @@ func updatePost(post Post) error {
 		ctx,
 		`UPDATE posts SET 
 			author = ?, 
-			description = ?, 
-			updatedAt = ?
+			description = ? 
 		WHERE id = ? `,
-		post.author,
-		post.description,
-		time.Now(),
-		post.id,
+		&post.Author,
+		&post.Description,
+		id,
 	)
 
 	if err != nil {
@@ -126,7 +124,7 @@ func updatePost(post Post) error {
 	return nil
 }
 
-func insertPost(post Post) (int, error) {
+func insertPost(newPost CreatePost) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -135,15 +133,11 @@ func insertPost(post Post) (int, error) {
 		`INSERT INTO posts 
 			(
 				author, 
-				description, 
-				createdAt, 
-				updatedAt
+				description 
 			) 
-		VALUES (?, ?, ?, ?)`,
-		post.author,
-		post.description,
-		time.Now(),
-		time.Now(),
+		VALUES (?, ?)`,
+		newPost.Author,
+		newPost.Description,
 	)
 
 	if err != nil {
@@ -186,11 +180,11 @@ func getToptenPosts() ([]Post, error) {
 		var post Post
 
 		results.Scan(
-			&post.id,
-			&post.author,
-			&post.description,
-			&post.createdAt,
-			&post.updatedAt,
+			&post.ID,
+			&post.Author,
+			&post.Description,
+			// &post.createdAt,
+			// &post.updatedAt,
 		)
 
 		posts = append(posts, post)
@@ -215,18 +209,18 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 		FROM posts WHERE
 	`)
 
-	if postFilter.author != "" {
+	if postFilter.Author != "" {
 		queryBuilder.WriteString(`author LIKE ? `)
-		queryArgs = append(queryArgs, "%"+strings.ToLower(postFilter.author)+"%")
+		queryArgs = append(queryArgs, "%"+strings.ToLower(postFilter.Author)+"%")
 	}
 
-	if postFilter.description != "" {
+	if postFilter.Description != "" {
 		if len(queryArgs) > 0 {
 			queryBuilder.WriteString(" AND ")
 		}
 
 		queryBuilder.WriteString(`description LIKE ? `)
-		queryArgs = append(queryArgs, "%"+strings.ToLower(postFilter.description)+"%")
+		queryArgs = append(queryArgs, "%"+strings.ToLower(postFilter.Description)+"%")
 	}
 
 	results, err := database.DbConn.QueryContext(ctx, queryBuilder.String(), queryArgs...)
@@ -244,11 +238,11 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 		var post Post
 
 		results.Scan(
-			&post.id,
-			&post.author,
-			&post.description,
-			&post.createdAt,
-			&post.updatedAt,
+			&post.ID,
+			&post.Author,
+			&post.Description,
+			// &post.createdAt,
+			// &post.updatedAt,
 		)
 
 		posts = append(posts, post)

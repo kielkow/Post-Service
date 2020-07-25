@@ -48,7 +48,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(postsJSON)
 
 	case http.MethodPost:
-		var newPost Post
+		var newPost CreatePost
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 
 		if err != nil {
@@ -59,11 +59,6 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(bodyBytes, &newPost)
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		if newPost.id != 0 {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -134,12 +129,12 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if updatedPost.id != id {
+		if updatedPost.ID != id {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		err = updatePost(updatedPost)
+		err = updatePost(id, updatedPost)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

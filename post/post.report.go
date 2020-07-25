@@ -12,9 +12,10 @@ import (
 
 // ReportFilter struct
 type ReportFilter struct {
-	author      string `json: "author"`
-	description string `json: "description"`
+	Author      string `json:"author"`
+	Description string `json:"description"`
 }
+
 
 func handlePostReport(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
