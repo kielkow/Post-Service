@@ -20,7 +20,9 @@ func getPost(id int) (*Post, error) {
 		`SELECT 
 			id, 
 			author, 
-			description
+			description,
+			createdAt,
+			updatedAt
 		FROM posts
 		WHERE id = ?`,
 		id,
@@ -32,8 +34,8 @@ func getPost(id int) (*Post, error) {
 		&post.ID,
 		&post.Author,
 		&post.Description,
-		// &post.createdAt,
-		// &post.updatedAt,
+		&post.CreatedAt,
+		&post.UpdatedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -72,7 +74,9 @@ func getPostList() ([]Post, error) {
 		`SELECT 
 			id, 
 			author, 
-			description
+			description,
+			createdAt,
+			updatedAt
 		from posts`,
 	)
 
@@ -92,8 +96,8 @@ func getPostList() ([]Post, error) {
 			&post.ID,
 			&post.Author,
 			&post.Description,
-			// &post.createdAt,
-			// &post.updatedAt,
+			&post.CreatedAt,
+			&post.UpdatedAt,
 		)
 
 		posts = append(posts, post)
@@ -186,8 +190,8 @@ func getToptenPosts() ([]Post, error) {
 			&post.ID,
 			&post.Author,
 			&post.Description,
-			// &post.createdAt,
-			// &post.updatedAt,
+			&post.CreatedAt,
+			&post.UpdatedAt,
 		)
 
 		posts = append(posts, post)
@@ -206,7 +210,9 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 	queryBuilder.WriteString(`SELECT
 		id,
 		author,
-		description
+		description,
+		createdAt,
+		updatedAt
 		FROM posts WHERE
 	`)
 
@@ -242,8 +248,8 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 			&post.ID,
 			&post.Author,
 			&post.Description,
-			// &post.createdAt,
-			// &post.updatedAt,
+			&post.CreatedAt,
+			&post.UpdatedAt,
 		)
 
 		posts = append(posts, post)
