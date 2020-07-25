@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -83,7 +82,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
 
 	if err != nil {
-		log.Print(err)
+		fmt.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -91,6 +90,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	post, err := getPost(id)
 
 	if err != nil {
+		fmt.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -118,6 +118,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 
 		if err != nil {
+			fmt.Print(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -125,11 +126,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(bodyBytes, &updatedPost)
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		if updatedPost.ID != id {
+			fmt.Print(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -137,6 +134,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		err = updatePost(id, updatedPost)
 
 		if err != nil {
+			fmt.Print(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

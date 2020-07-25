@@ -3,6 +3,7 @@ package post
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -19,9 +20,7 @@ func getPost(id int) (*Post, error) {
 		`SELECT 
 			id, 
 			author, 
-			description,
-			createdAt,
-			updatedAt
+			description
 		FROM posts
 		WHERE id = ?`,
 		id,
@@ -40,6 +39,7 @@ func getPost(id int) (*Post, error) {
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
+		fmt.Print(err)
 		return nil, err
 	}
 
@@ -56,6 +56,7 @@ func removePost(id int) error {
 	)
 
 	if err != nil {
+		fmt.Print(err)
 		return err
 	}
 
@@ -71,13 +72,12 @@ func getPostList() ([]Post, error) {
 		`SELECT 
 			id, 
 			author, 
-			description,
-			createdAt,
-			updatedAt
+			description
 		from posts`,
 	)
 
 	if err != nil {
+		fmt.Print(err)
 		return nil, err
 	}
 
@@ -118,6 +118,7 @@ func updatePost(id int, post Post) error {
 	)
 
 	if err != nil {
+		fmt.Print(err)
 		return err
 	}
 
@@ -147,6 +148,7 @@ func insertPost(newPost CreatePost) (int, error) {
 	insertID, err := result.LastInsertId()
 
 	if err != nil {
+		fmt.Print(err)
 		return 0, err
 	}
 
@@ -169,6 +171,7 @@ func getToptenPosts() ([]Post, error) {
 	)
 
 	if err != nil {
+		fmt.Print(err)
 		return nil, err
 	}
 
@@ -203,9 +206,7 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 	queryBuilder.WriteString(`SELECT
 		id,
 		author,
-		description,
-		createdAt, 
-		updatedAt
+		description
 		FROM posts WHERE
 	`)
 
