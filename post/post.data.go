@@ -212,7 +212,7 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 
 	if postFilter.Author != "" {
 		queryBuilder.WriteString(`author LIKE ? `)
-		queryArgs = append(queryArgs, "%"+strings.ToLower(postFilter.Author)+"%")
+		queryArgs = append(queryArgs, "%"+postFilter.Author+"%")
 	}
 
 	if postFilter.Description != "" {
@@ -221,7 +221,7 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 		}
 
 		queryBuilder.WriteString(`description LIKE ? `)
-		queryArgs = append(queryArgs, "%"+strings.ToLower(postFilter.Description)+"%")
+		queryArgs = append(queryArgs, "%"+postFilter.Description+"%")
 	}
 
 	results, err := database.DbConn.QueryContext(ctx, queryBuilder.String(), queryArgs...)

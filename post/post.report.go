@@ -16,7 +16,6 @@ type ReportFilter struct {
 	Description string `json:"description"`
 }
 
-
 func handlePostReport(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
