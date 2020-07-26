@@ -1,5 +1,10 @@
 FROM golang:1.14
+
 RUN apk add bash mysql-client
+
+RUN apk add --no-cache shadow
+
+RUN usermod -u 1000 go
 
 RUN mkdir -p /home/go/api && chown -R go:go /home/go/api
 
