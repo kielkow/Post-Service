@@ -18,13 +18,19 @@ func getPost(id int) (*Post, error) {
 	row := database.DbConn.QueryRowContext(
 		ctx,
 		`SELECT 
-			id, 
-			author, 
+			posts.id, 
+			authors.id AS authorId, 
+			authors.firstname, 
+			authors.lastname, 
+			authors.email,
+			authors.createdAt AS authorCreatedAt, 
+			authors.updatedAt AS authorUpdatedAt, 
 			description,
-			createdAt,
-			updatedAt
+			posts.createdAt,
+			posts.updatedAt
 		FROM posts
-		WHERE id = ?`,
+		LEFT JOIN authors ON authors.id = posts.authorId
+		WHERE posts.id = ?`,
 		id,
 	)
 
@@ -32,7 +38,12 @@ func getPost(id int) (*Post, error) {
 
 	err := row.Scan(
 		&post.ID,
-		&post.Author,
+		&post.Author.ID,
+		&post.Author.FirstName,
+		&post.Author.LastName,
+		&post.Author.Email,
+		&post.Author.CreatedAt,
+		&post.Author.UpdatedAt,
 		&post.Description,
 		&post.CreatedAt,
 		&post.UpdatedAt,
@@ -72,12 +83,18 @@ func getPostList() ([]Post, error) {
 	results, err := database.DbConn.QueryContext(
 		ctx,
 		`SELECT 
-			id, 
-			author, 
+			posts.id, 
+			authors.id AS authorId, 
+			authors.firstname, 
+			authors.lastname, 
+			authors.email,
+			authors.createdAt AS authorCreatedAt, 
+			authors.updatedAt AS authorUpdatedAt, 
 			description,
-			createdAt,
-			updatedAt
-		from posts`,
+			posts.createdAt,
+			posts.updatedAt
+		FROM posts
+		LEFT JOIN authors ON authors.id = posts.authorId`,
 	)
 
 	if err != nil {
@@ -94,7 +111,12 @@ func getPostList() ([]Post, error) {
 
 		results.Scan(
 			&post.ID,
-			&post.Author,
+			&post.Author.ID,
+			&post.Author.FirstName,
+			&post.Author.LastName,
+			&post.Author.Email,
+			&post.Author.CreatedAt,
+			&post.Author.UpdatedAt,
 			&post.Description,
 			&post.CreatedAt,
 			&post.UpdatedAt,
@@ -106,18 +128,18 @@ func getPostList() ([]Post, error) {
 	return posts, nil
 }
 
-func updatePost(id int, post Post) error {
+func updatePost(id int, updatePost UpdatePost) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	_, err := database.DbConn.ExecContext(
 		ctx,
 		`UPDATE posts SET 
-			author = ?, 
+			authorId = ?, 
 			description = ? 
-		WHERE id = ? `,
-		&post.Author,
-		&post.Description,
+		WHERE id = ?`,
+		&updatePost.AuthorID,
+		&updatePost.Description,
 		id,
 	)
 
@@ -137,11 +159,11 @@ func insertPost(newPost CreatePost) (int, error) {
 		ctx,
 		`INSERT INTO posts 
 			(
-				author, 
+				authorId, 
 				description 
 			) 
 		VALUES (?, ?)`,
-		newPost.Author,
+		newPost.AuthorID,
 		newPost.Description,
 	)
 
@@ -166,12 +188,19 @@ func getToptenPosts() ([]Post, error) {
 	results, err := database.DbConn.QueryContext(
 		ctx,
 		`SELECT 
-			id, 
-			author, 
-			description, 
-			createdAt, 
-			updatedAt 
-		from posts ORDER BY id DESC LIMIT 10`,
+			posts.id, 
+			authors.id AS authorId, 
+			authors.firstname, 
+			authors.lastname, 
+			authors.email,
+			authors.createdAt AS authorCreatedAt, 
+			authors.updatedAt AS authorUpdatedAt, 
+			description,
+			posts.createdAt,
+			posts.updatedAt
+		FROM posts
+		LEFT JOIN authors ON authors.id = posts.authorId
+		ORDER BY id DESC LIMIT 10`,
 	)
 
 	if err != nil {
@@ -188,7 +217,12 @@ func getToptenPosts() ([]Post, error) {
 
 		results.Scan(
 			&post.ID,
-			&post.Author,
+			&post.Author.ID,
+			&post.Author.FirstName,
+			&post.Author.LastName,
+			&post.Author.Email,
+			&post.Author.CreatedAt,
+			&post.Author.UpdatedAt,
 			&post.Description,
 			&post.CreatedAt,
 			&post.UpdatedAt,
@@ -208,16 +242,23 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 	var queryBuilder strings.Builder
 
 	queryBuilder.WriteString(`SELECT
-		id,
-		author,
-		description,
-		createdAt,
-		updatedAt
-		FROM posts WHERE
+			posts.id, 
+			authors.id AS authorId, 
+			authors.firstname, 
+			authors.lastname, 
+			authors.email,
+			authors.createdAt AS authorCreatedAt, 
+			authors.updatedAt AS authorUpdatedAt, 
+			description,
+			posts.createdAt,
+			posts.updatedAt
+		FROM posts
+		LEFT JOIN authors ON authors.id = posts.authorId
+		WHERE
 	`)
 
 	if postFilter.Author != "" {
-		queryBuilder.WriteString(`author LIKE ? `)
+		queryBuilder.WriteString(`authors.firstname LIKE ? `)
 		queryArgs = append(queryArgs, "%"+postFilter.Author+"%")
 	}
 
@@ -246,7 +287,12 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 
 		results.Scan(
 			&post.ID,
-			&post.Author,
+			&post.Author.ID,
+			&post.Author.FirstName,
+			&post.Author.LastName,
+			&post.Author.Email,
+			&post.Author.CreatedAt,
+			&post.Author.UpdatedAt,
 			&post.Description,
 			&post.CreatedAt,
 			&post.UpdatedAt,

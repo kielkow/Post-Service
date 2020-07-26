@@ -51,6 +51,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 
 		if err != nil {
+			fmt.Print(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -58,6 +59,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(bodyBytes, &newPost)
 
 		if err != nil {
+			fmt.Print(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -65,6 +67,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		_, err = insertPost(newPost)
 
 		if err != nil {
+			fmt.Print(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -113,7 +116,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(postJSON)
 
 	case http.MethodPut:
-		var updatedPost Post
+		var updatedPost UpdatePost
 
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 

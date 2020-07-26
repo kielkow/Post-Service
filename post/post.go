@@ -1,18 +1,29 @@
 package post
 
-import "time"
+import (
+	"time"
+
+	"github.com/kielkow/Post-Service/author"
+)
 
 // Post struct
 type Post struct {
-	ID          int    `json:"id"`
-	Author      string `json:"author"`
-	Description string `json:"description"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          int           `json:"id"`
+	Author      author.Author `json:"author"`
+	Description string        `json:"description"`
+	CreatedAt   time.Time     `json:"createdAt"`
+	UpdatedAt   time.Time     `json:"updatedAt"`
 }
 
 // CreatePost struct
 type CreatePost struct {
-	Author      string `json:"author"`
+	AuthorID    int    `json:"authorId"`
 	Description string `json:"description"`
 }
+
+// UpdatePost struct
+type UpdatePost struct {
+	AuthorID    int    `json:"authorId"`
+	Description string `json:"description"`
+}
+
