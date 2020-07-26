@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kielkow/Post-Service/author"
 	"github.com/kielkow/Post-Service/cors"
 )
 
@@ -61,6 +62,19 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Print(err)
 			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		authorExists, err := author.GetAuthor(newPost.AuthorID)
+
+		if err != nil {
+			fmt.Print(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if authorExists == nil {
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 
@@ -131,6 +145,19 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Print(err)
 			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		authorExists, err := author.GetAuthor(updatedPost.AuthorID)
+
+		if err != nil {
+			fmt.Print(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if authorExists == nil {
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 

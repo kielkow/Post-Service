@@ -11,7 +11,8 @@ import (
 	"github.com/kielkow/Post-Service/database"
 )
 
-func getAuthor(id int) (*Author, error) {
+// GetAuthor function
+func GetAuthor(id int) (*Author, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 

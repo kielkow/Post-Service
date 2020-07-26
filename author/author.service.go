@@ -87,7 +87,7 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	author, err := getAuthor(id)
+	author, err := GetAuthor(id)
 
 	if err != nil {
 		fmt.Print(err)
