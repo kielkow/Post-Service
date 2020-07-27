@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"html/template"
-	"log"
 	"net/http"
 	"path"
 	"time"
+
+	"github.com/kielkow/Post-Service/apperror"
 )
 
 // ReportFilter struct
@@ -24,16 +25,20 @@ func handlePostReport(w http.ResponseWriter, r *http.Request) {
 		err := json.NewDecoder(r.Body).Decode(&postFilter)
 
 		if err != nil {
-			log.Println(err)
+			error := apperror.GenerateError(400, err.Error())
+
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		posts, err := searchPostData(postFilter)
 
 		if err != nil {
-			log.Println(err)
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -41,8 +46,10 @@ func handlePostReport(w http.ResponseWriter, r *http.Request) {
 		t, err = t.ParseFiles(path.Join("templates", "report.gotmpl"))
 
 		if err != nil {
-			log.Println(err)
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 

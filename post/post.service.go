@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kielkow/Post-Service/apperror"
 	"github.com/kielkow/Post-Service/author"
 	"github.com/kielkow/Post-Service/cors"
 )
@@ -33,14 +34,20 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		postList, err := getPostList()
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
 		postsJSON, err := json.Marshal(postList)
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -52,37 +59,48 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(400, err.Error())
+
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		err = json.Unmarshal(bodyBytes, &newPost)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(400, err.Error())
+
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		authorExists, err := author.GetAuthor(newPost.AuthorID)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
 		if authorExists == nil {
+			error := apperror.GenerateError(404, "Author not found")
+
 			w.WriteHeader(http.StatusNotFound)
+			w.Write(error)
 			return
 		}
 
 		_, err = insertPost(newPost)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -99,21 +117,28 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
 
 	if err != nil {
-		fmt.Print(err)
+		error := apperror.GenerateError(500, err.Error())
+
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(error)
 		return
 	}
 
 	post, err := getPost(id)
 
 	if err != nil {
-		fmt.Print(err)
+		error := apperror.GenerateError(500, err.Error())
+
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(error)
 		return
 	}
 
 	if post == nil {
+		error := apperror.GenerateError(404, "Post not found")
+
 		w.WriteHeader(http.StatusNotFound)
+		w.Write(error)
 		return
 	}
 
@@ -122,7 +147,10 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		postJSON, err := json.Marshal(post)
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+	
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -135,37 +163,48 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(400, err.Error())
+	
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		err = json.Unmarshal(bodyBytes, &updatedPost)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(400, err.Error())
+	
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		authorExists, err := author.GetAuthor(updatedPost.AuthorID)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(500, err.Error())
+	
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
 		if authorExists == nil {
+			error := apperror.GenerateError(404, "Author not found")
+	
 			w.WriteHeader(http.StatusNotFound)
+			w.Write(error)
 			return
 		}
 
 		err = updatePost(id, updatedPost)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(500, err.Error())
+	
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -176,7 +215,10 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 		err = removePost(id)
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+	
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
