@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kielkow/Post-Service/apperror"
 	"github.com/kielkow/Post-Service/cors"
 )
 
@@ -32,14 +33,20 @@ func authorsHandler(w http.ResponseWriter, r *http.Request) {
 		authorList, err := getAuthorList()
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
 		authorsJSON, err := json.Marshal(authorList)
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -51,21 +58,30 @@ func authorsHandler(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 
 		if err != nil {
+			error := apperror.GenerateError(400, err.Error())
+
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		err = json.Unmarshal(bodyBytes, &newAuthor)
 
 		if err != nil {
+			error := apperror.GenerateError(400, err.Error())
+
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		_, err = insertAuthor(newAuthor)
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -82,21 +98,28 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
 
 	if err != nil {
-		fmt.Print(err)
+		error := apperror.GenerateError(500, err.Error())
+
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(error)
 		return
 	}
 
 	author, err := GetAuthor(id)
 
 	if err != nil {
-		fmt.Print(err)
+		error := apperror.GenerateError(500, err.Error())
+
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(error)
 		return
 	}
 
 	if author == nil {
+		error := apperror.GenerateError(404, "Author not found")
+
 		w.WriteHeader(http.StatusNotFound)
+		w.Write(error)
 		return
 	}
 
@@ -105,7 +128,10 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 		authorJSON, err := json.Marshal(author)
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -118,24 +144,30 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(400, err.Error())
+
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		err = json.Unmarshal(bodyBytes, &updatedAuthor)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(400, err.Error())
+
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		err = updateAuthor(id, updatedAuthor)
 
 		if err != nil {
-			fmt.Print(err)
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -146,7 +178,10 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 		err = removeAuthor(id)
 
 		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 

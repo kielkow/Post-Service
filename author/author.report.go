@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"html/template"
-	"log"
 	"net/http"
 	"path"
 	"time"
+
+	"github.com/kielkow/Post-Service/apperror"
 )
 
 // ReportFilter struct
@@ -24,16 +25,20 @@ func handleAuthorReport(w http.ResponseWriter, r *http.Request) {
 		err := json.NewDecoder(r.Body).Decode(&authorFilter)
 
 		if err != nil {
-			log.Println(err)
+			error := apperror.GenerateError(400, err.Error())
+
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
 			return
 		}
 
 		authors, err := searchAuthorData(authorFilter)
 
 		if err != nil {
-			log.Println(err)
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
@@ -41,8 +46,10 @@ func handleAuthorReport(w http.ResponseWriter, r *http.Request) {
 		t, err = t.ParseFiles(path.Join("templates", "report_author.gotmpl"))
 
 		if err != nil {
-			log.Println(err)
+			error := apperror.GenerateError(500, err.Error())
+
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
 			return
 		}
 
