@@ -7,12 +7,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kielkow/Post-Service/author"
 	"github.com/kielkow/Post-Service/database"
+	"github.com/kielkow/Post-Service/env"
 	"github.com/kielkow/Post-Service/post"
 )
 
 const apiBasePath = "/api"
 
 func main() {
+	env.SetEnv()
+
 	database.SetupDatabase()
 
 	author.SetupRoutes(apiBasePath)
