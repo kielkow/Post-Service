@@ -18,3 +18,9 @@ type CreateAuthor struct {
 	LastName  string `json:"lastname"`
 	Email     string `json:"email"`
 }
+
+// CreateAuthorAvatar struct
+type CreateAuthorAvatar struct {
+	AuthorID int    `json:"authorId"`
+	Avatar   string `json:"avatar"`
+}

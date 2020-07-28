@@ -271,3 +271,34 @@ func searchAuthorData(authorFilter ReportFilter) ([]Author, error) {
 
 	return authors, nil
 }
+
+func createAvatar(newAvatar CreateAuthorAvatar) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	result, err := database.DbConn.ExecContext(
+		ctx,
+		`INSERT INTO avatars 
+			(
+				authorId, 
+				avatar
+			) 
+		VALUES (?, ?)`,
+		newAvatar.AuthorID,
+		newAvatar.Avatar,
+	)
+
+	if err != nil {
+		fmt.Print(err)
+		return 0, err
+	}
+
+	insertID, err := result.LastInsertId()
+
+	if err != nil {
+		fmt.Print(err)
+		return 0, err
+	}
+
+	return int(insertID), err
+}

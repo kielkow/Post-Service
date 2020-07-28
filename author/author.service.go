@@ -1,8 +1,10 @@
 package author
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/kielkow/Post-Service/apperror"
 	"github.com/kielkow/Post-Service/cors"
+	"github.com/kielkow/Post-Service/storage"
 )
 
 const authorsBasePath = "authors"
@@ -172,6 +175,46 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(http.StatusOK)
+		return
+
+	case http.MethodPatch:
+		_, multipartFileHeader, err := r.FormFile("avatar")
+
+		if err != nil {
+			error := apperror.GenerateError(400, err.Error())
+
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
+			return
+		}
+
+		h := md5.New()
+		io.WriteString(h, multipartFileHeader.Filename)
+		hashedName := string(h.Sum(nil)) + "-" + multipartFileHeader.Filename
+
+		err = storage.UploadFile(hashedName)
+
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		newAvatar := CreateAuthorAvatar{id, hashedName}
+
+		_, err = createAvatar(newAvatar)
+
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
 		return
 
 	case http.MethodDelete:
