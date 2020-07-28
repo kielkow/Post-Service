@@ -1,4 +1,4 @@
-version: '3'
+version: '2.3'
 
 services:
   app:
@@ -8,6 +8,9 @@ services:
       - .:/go/src
     networks: 
       - app-network
+    depends_on:
+      db:
+        condition: service_healthy
 
   nginx:
     build: .docker/nginx
@@ -38,7 +41,12 @@ services:
       - MYSQL_USER=root
     networks: 
       - app-network
-
+    healthcheck:
+      test: ["CMD-SHELL", 'mysql -uroot --database=post_services --password=root --execute="SELECT count(table_name) > 0 FROM information_schema.tables;" --skip-column-names -B']
+      interval: 10s
+      timeout: 10s
+      retries: 4
+  
   redis:
     image: redis:alpine
     expose:
