@@ -15,7 +15,7 @@ import (
 
 	"github.com/kielkow/Post-Service/apperror"
 	"github.com/kielkow/Post-Service/cors"
-	// "github.com/kielkow/Post-Service/storage"
+	"github.com/kielkow/Post-Service/storage"
 )
 
 const authorsBasePath = "authors"
@@ -223,27 +223,27 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 
 		io.Copy(f, file)
 
-		// err = storage.UploadFile(hashedName)
+		err = storage.UploadFile(filepath.Join(ReceiptDirectory, hashedName), hashedName)
 
-		// if err != nil {
-		// 	error := apperror.GenerateError(500, err.Error())
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
 
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	w.Write(error)
-		// 	return
-		// }
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
 
-		// newAvatar := CreateAuthorAvatar{id, hashedName}
+		newAvatar := CreateAuthorAvatar{id, hashedName}
 
-		// _, err = createAvatar(newAvatar)
+		_, err = createAvatar(newAvatar)
 
-		// if err != nil {
-		// 	error := apperror.GenerateError(500, err.Error())
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
 
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	w.Write(error)
-		// 	return
-		// }
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
 
 		w.WriteHeader(http.StatusCreated)
 		return

@@ -11,7 +11,7 @@ import (
 )
 
 // UploadFile func
-func UploadFile(uploadFileDir string) error {
+func UploadFile(uploadFileDir string, hashedName string) error {
 	session, err := session.NewSession(&aws.Config{
 		Region: aws.String(os.Getenv("AWS_S3_REGION")),
 	})
@@ -38,7 +38,7 @@ func UploadFile(uploadFileDir string) error {
 
 	_, err = s3.New(session).PutObject(&s3.PutObjectInput{
 		Bucket:               aws.String(os.Getenv("AWS_S3_BUCKET")),
-		Key:                  aws.String(uploadFileDir),
+		Key:                  aws.String(hashedName),
 		ACL:                  aws.String("private"),
 		Body:                 bytes.NewReader(fileBuffer),
 		ContentLength:        aws.Int64(fileSize),
