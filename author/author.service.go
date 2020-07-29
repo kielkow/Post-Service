@@ -1,21 +1,27 @@
 package author
 
 import (
-	"crypto/md5"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/kielkow/Post-Service/apperror"
 	"github.com/kielkow/Post-Service/cors"
-	"github.com/kielkow/Post-Service/storage"
+	// "github.com/kielkow/Post-Service/storage"
 )
 
 const authorsBasePath = "authors"
+
+// ReceiptDirectory uploads
+var ReceiptDirectory string = filepath.Join("uploads")
 
 // SetupRoutes function
 func SetupRoutes(apiBasePath string) {
@@ -178,7 +184,20 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case http.MethodPatch:
-		_, multipartFileHeader, err := r.FormFile("avatar")
+		r.ParseMultipartForm(5 << 20) // 5Mb
+		file, handler, err := r.FormFile("avatar")
+
+		bytes := make([]byte, 10)
+
+		if _, err := rand.Read(bytes); err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		hashedName := hex.EncodeToString(bytes) + "-" + handler.Filename
 
 		if err != nil {
 			error := apperror.GenerateError(400, err.Error())
@@ -188,11 +207,9 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		h := md5.New()
-		io.WriteString(h, multipartFileHeader.Filename)
-		hashedName := string(h.Sum(nil)) + "-" + multipartFileHeader.Filename
+		defer file.Close()
 
-		err = storage.UploadFile(hashedName)
+		f, err := os.OpenFile(filepath.Join(ReceiptDirectory, hashedName), os.O_WRONLY|os.O_CREATE, 0666)
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
@@ -202,17 +219,31 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		newAvatar := CreateAuthorAvatar{id, hashedName}
+		defer f.Close()
 
-		_, err = createAvatar(newAvatar)
+		io.Copy(f, file)
 
-		if err != nil {
-			error := apperror.GenerateError(500, err.Error())
+		// err = storage.UploadFile(hashedName)
 
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(error)
-			return
-		}
+		// if err != nil {
+		// 	error := apperror.GenerateError(500, err.Error())
+
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	w.Write(error)
+		// 	return
+		// }
+
+		// newAvatar := CreateAuthorAvatar{id, hashedName}
+
+		// _, err = createAvatar(newAvatar)
+
+		// if err != nil {
+		// 	error := apperror.GenerateError(500, err.Error())
+
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	w.Write(error)
+		// 	return
+		// }
 
 		w.WriteHeader(http.StatusCreated)
 		return
