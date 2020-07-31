@@ -1,4 +1,4 @@
-package author
+package post
 
 import (
 	"bytes"
@@ -8,21 +8,21 @@ import (
 	"path"
 	"time"
 
-	"github.com/kielkow/Post-Service/apperror"
+	"github.com/kielkow/Post-Service/shared/providers/apperror"
 )
 
 // ReportFilter struct
 type ReportFilter struct {
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
+	Author      string `json:"author"`
+	Description string `json:"description"`
 }
 
-func handleAuthorReport(w http.ResponseWriter, r *http.Request) {
+func handlePostReport(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		var authorFilter ReportFilter
+		var postFilter ReportFilter
 
-		err := json.NewDecoder(r.Body).Decode(&authorFilter)
+		err := json.NewDecoder(r.Body).Decode(&postFilter)
 
 		if err != nil {
 			error := apperror.GenerateError(400, err.Error())
@@ -32,7 +32,7 @@ func handleAuthorReport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		authors, err := searchAuthorData(authorFilter)
+		posts, err := searchPostData(postFilter)
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
@@ -42,8 +42,8 @@ func handleAuthorReport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		t := template.New("report_author.gotmpl").Funcs(template.FuncMap{"mod": func(i, x int) bool { return i%x == 0 }})
-		t, err = t.ParseFiles(path.Join("templates", "report_author.gotmpl"))
+		t := template.New("report.gotmpl").Funcs(template.FuncMap{"mod": func(i, x int) bool { return i%x == 0 }})
+		t, err = t.ParseFiles(path.Join("templates", "report.gotmpl"))
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
@@ -55,8 +55,8 @@ func handleAuthorReport(w http.ResponseWriter, r *http.Request) {
 
 		var tmpl bytes.Buffer
 
-		if len(authors) > 0 {
-			err = t.Execute(&tmpl, authors)
+		if len(posts) > 0 {
+			err = t.Execute(&tmpl, posts)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -66,7 +66,7 @@ func handleAuthorReport(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Disposition", "Attachement")
 
-		http.ServeContent(w, r, "report_author.html", time.Now(), rdr)
+		http.ServeContent(w, r, "report.html", time.Now(), rdr)
 
 	case http.MethodOptions:
 		return

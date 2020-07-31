@@ -13,9 +13,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kielkow/Post-Service/apperror"
-	"github.com/kielkow/Post-Service/cors"
-	"github.com/kielkow/Post-Service/storage"
+	"github.com/kielkow/Post-Service/shared/providers/apperror"
+	"github.com/kielkow/Post-Service/shared/http/cors"
+	"github.com/kielkow/Post-Service/shared/providers/storage"
 )
 
 const authorsBasePath = "authors"

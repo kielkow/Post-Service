@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kielkow/Post-Service/database"
+	"github.com/kielkow/Post-Service/shared/database"
 )
 
 // GetAuthor function
