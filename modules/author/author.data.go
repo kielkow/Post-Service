@@ -19,14 +19,19 @@ func GetAuthor(id int) (*Author, error) {
 	row := database.DbConn.QueryRowContext(
 		ctx,
 		`SELECT 
-			id, 
-			firstname, 
-			lastname, 
-			email,
-			createdAt,
-			updatedAt
-		FROM authors
-		WHERE id = ?`,
+				authors.id,
+				firstname,
+				lastname,
+				email,
+				avatars.avatar,
+				authors.createdAt,
+				authors.updatedAt
+		FROM
+				authors
+						LEFT JOIN
+				avatars ON avatars.authorId = authors.id
+		WHERE
+				authors.id = ?;`,
 		id,
 	)
 
@@ -37,6 +42,7 @@ func GetAuthor(id int) (*Author, error) {
 		&author.FirstName,
 		&author.LastName,
 		&author.Email,
+		&author.Avatar,
 		&author.CreatedAt,
 		&author.UpdatedAt,
 	)
@@ -75,13 +81,17 @@ func getAuthorList() ([]Author, error) {
 	results, err := database.DbConn.QueryContext(
 		ctx,
 		`SELECT 
-			id, 
-			firstname, 
-			lastname, 
-			email,
-			createdAt,
-			updatedAt
-		from authors`,
+				authors.id,
+				firstname,
+				lastname,
+				email,
+				avatars.avatar,
+				authors.createdAt,
+				authors.updatedAt
+		FROM
+				authors
+						LEFT JOIN
+				avatars ON avatars.authorId = authors.id`,
 	)
 
 	if err != nil {
@@ -101,6 +111,7 @@ func getAuthorList() ([]Author, error) {
 			&author.FirstName,
 			&author.LastName,
 			&author.Email,
+			&author.Avatar,
 			&author.CreatedAt,
 			&author.UpdatedAt,
 		)
@@ -176,13 +187,19 @@ func getToptenAuthors() ([]Author, error) {
 	results, err := database.DbConn.QueryContext(
 		ctx,
 		`SELECT 
-			id, 
-			firstname, 
-			lastname, 
-			email, 
-			createdAt, 
-			updatedAt 
-		from authors ORDER BY id DESC LIMIT 10`,
+				authors.id,
+				firstname,
+				lastname,
+				email,
+				avatars.avatar,
+				authors.createdAt,
+				authors.updatedAt
+		FROM
+				authors
+						LEFT JOIN
+				avatars ON avatars.authorId = authors.id
+		ORDER BY id DESC
+		LIMIT 10;`,
 	)
 
 	if err != nil {
@@ -202,6 +219,7 @@ func getToptenAuthors() ([]Author, error) {
 			&author.FirstName,
 			&author.LastName,
 			&author.Email,
+			&author.Avatar,
 			&author.CreatedAt,
 			&author.UpdatedAt,
 		)
@@ -219,14 +237,20 @@ func searchAuthorData(authorFilter ReportFilter) ([]Author, error) {
 	var queryArgs = make([]interface{}, 0)
 	var queryBuilder strings.Builder
 
-	queryBuilder.WriteString(`SELECT
-		id,
-		firstname,
-		lastname,
-		email,
-		createdAt,
-		updatedAt
-		FROM authors WHERE
+	queryBuilder.WriteString(
+	 `SELECT
+			authors.id,
+			firstname,
+			lastname,
+			email,
+			avatars.avatar,
+			authors.createdAt,
+			authors.updatedAt
+		FROM
+			authors
+					LEFT JOIN
+			avatars ON avatars.authorId = authors.id
+		WHERE
 	`)
 
 	if authorFilter.FirstName != "" {
@@ -262,6 +286,7 @@ func searchAuthorData(authorFilter ReportFilter) ([]Author, error) {
 			&author.FirstName,
 			&author.LastName,
 			&author.Email,
+			&author.Avatar,
 			&author.CreatedAt,
 			&author.UpdatedAt,
 		)

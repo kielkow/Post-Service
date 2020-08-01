@@ -23,6 +23,7 @@ func getPost(id int) (*Post, error) {
 			authors.firstname, 
 			authors.lastname, 
 			authors.email,
+			avatars.avatar,
 			authors.createdAt AS authorCreatedAt, 
 			authors.updatedAt AS authorUpdatedAt, 
 			description,
@@ -30,6 +31,7 @@ func getPost(id int) (*Post, error) {
 			posts.updatedAt
 		FROM posts
 		LEFT JOIN authors ON authors.id = posts.authorId
+		LEFT JOIN avatars ON avatars.authorId = authors.id
 		WHERE posts.id = ?`,
 		id,
 	)
@@ -42,6 +44,7 @@ func getPost(id int) (*Post, error) {
 		&post.Author.FirstName,
 		&post.Author.LastName,
 		&post.Author.Email,
+		&post.Author.Avatar,
 		&post.Author.CreatedAt,
 		&post.Author.UpdatedAt,
 		&post.Description,
@@ -88,13 +91,15 @@ func getPostList() ([]Post, error) {
 			authors.firstname, 
 			authors.lastname, 
 			authors.email,
+			avatars.avatar,
 			authors.createdAt AS authorCreatedAt, 
 			authors.updatedAt AS authorUpdatedAt, 
 			description,
 			posts.createdAt,
 			posts.updatedAt
 		FROM posts
-		LEFT JOIN authors ON authors.id = posts.authorId`,
+		LEFT JOIN authors ON authors.id = posts.authorId
+		LEFT JOIN avatars ON avatars.authorId = authors.id`,
 	)
 
 	if err != nil {
@@ -115,6 +120,7 @@ func getPostList() ([]Post, error) {
 			&post.Author.FirstName,
 			&post.Author.LastName,
 			&post.Author.Email,
+			&post.Author.Avatar,
 			&post.Author.CreatedAt,
 			&post.Author.UpdatedAt,
 			&post.Description,
@@ -193,6 +199,7 @@ func getToptenPosts() ([]Post, error) {
 			authors.firstname, 
 			authors.lastname, 
 			authors.email,
+			avatars.avatar,
 			authors.createdAt AS authorCreatedAt, 
 			authors.updatedAt AS authorUpdatedAt, 
 			description,
@@ -200,6 +207,7 @@ func getToptenPosts() ([]Post, error) {
 			posts.updatedAt
 		FROM posts
 		LEFT JOIN authors ON authors.id = posts.authorId
+		LEFT JOIN avatars ON avatars.authorId = authors.id
 		ORDER BY id DESC LIMIT 10`,
 	)
 
@@ -221,6 +229,7 @@ func getToptenPosts() ([]Post, error) {
 			&post.Author.FirstName,
 			&post.Author.LastName,
 			&post.Author.Email,
+			&post.Author.Avatar,
 			&post.Author.CreatedAt,
 			&post.Author.UpdatedAt,
 			&post.Description,
@@ -247,6 +256,7 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 			authors.firstname, 
 			authors.lastname, 
 			authors.email,
+			avatars.avatar,
 			authors.createdAt AS authorCreatedAt, 
 			authors.updatedAt AS authorUpdatedAt, 
 			description,
@@ -254,6 +264,7 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 			posts.updatedAt
 		FROM posts
 		LEFT JOIN authors ON authors.id = posts.authorId
+		LEFT JOIN avatars ON avatars.authorId = authors.id
 		WHERE
 	`)
 
@@ -291,6 +302,7 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 			&post.Author.FirstName,
 			&post.Author.LastName,
 			&post.Author.Email,
+			&post.Author.Avatar,
 			&post.Author.CreatedAt,
 			&post.Author.UpdatedAt,
 			&post.Description,

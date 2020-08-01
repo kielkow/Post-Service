@@ -1,6 +1,8 @@
 package author
 
-import "time"
+import (
+	"time"
+)
 
 // Author struct
 type Author struct {
@@ -8,6 +10,7 @@ type Author struct {
 	FirstName string    `json:"firstname"`
 	LastName  string    `json:"lastname"`
 	Email     string    `json:"email"`
+	Avatar    *string   `json:"avatar"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
