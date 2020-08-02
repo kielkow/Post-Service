@@ -49,3 +49,21 @@ func UploadFile(uploadFileDir string, hashedName string) error {
 
 	return err
 }
+
+// DeleteFile func
+func DeleteFile(hashedName string) error {
+	session, err := session.NewSession(&aws.Config{
+		Region: aws.String(os.Getenv("AWS_S3_REGION")),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	_, err = s3.New(session).DeleteObject(&s3.DeleteObjectInput{
+		Bucket: aws.String(os.Getenv("AWS_S3_BUCKET")),
+		Key:    aws.String(hashedName),
+	})
+
+	return err
+}

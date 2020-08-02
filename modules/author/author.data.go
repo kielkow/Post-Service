@@ -393,3 +393,20 @@ func createAvatar(newAvatar CreateAuthorAvatar) (int, error) {
 
 	return int(insertID), err
 }
+
+func removeAvatar(avatar string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	_, err := database.DbConn.ExecContext(
+		ctx,
+		`DELETE FROM avatars WHERE avatar = ?`, avatar,
+	)
+
+	if err != nil {
+		fmt.Print(err)
+		return err
+	}
+
+	return nil
+}

@@ -13,8 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kielkow/Post-Service/shared/providers/apperror"
 	"github.com/kielkow/Post-Service/shared/http/cors"
+	"github.com/kielkow/Post-Service/shared/providers/apperror"
 	"github.com/kielkow/Post-Service/shared/providers/storage"
 )
 
@@ -184,6 +184,38 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case http.MethodPatch:
+		if author.Avatar != nil {
+			err = os.Remove(filepath.Join(ReceiptDirectory, *author.Avatar))
+
+			if err != nil {
+				error := apperror.GenerateError(500, err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(error)
+				return
+			}
+
+			err := removeAvatar(*author.Avatar)
+
+			if err != nil {
+				error := apperror.GenerateError(500, err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(error)
+				return
+			}
+
+			err = storage.DeleteFile(*author.Avatar)
+
+			if err != nil {
+				error := apperror.GenerateError(500, err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(error)
+				return
+			}
+		}
+
 		r.ParseMultipartForm(5 << 20) // 5Mb
 		file, handler, err := r.FormFile("avatar")
 
