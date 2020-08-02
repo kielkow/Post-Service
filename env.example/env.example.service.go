@@ -15,4 +15,6 @@ func SetEnv() {
 
 	os.Setenv("AWS_S3_REGION", "sa-east-1")
 	os.Setenv("AWS_S3_BUCKET", "example-bucket")
+
+	os.Setenv("AWS_SES_SENDER", "example@example.com")
 }

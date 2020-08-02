@@ -8,9 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kielkow/Post-Service/shared/providers/apperror"
 	"github.com/kielkow/Post-Service/modules/author"
 	"github.com/kielkow/Post-Service/shared/http/cors"
+	"github.com/kielkow/Post-Service/shared/providers/apperror"
+	"github.com/kielkow/Post-Service/shared/providers/email"
 )
 
 const postsBasePath = "posts"
@@ -95,6 +96,22 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		_, err = insertPost(newPost)
+
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		recipient, err := author.GetAuthor(newPost.AuthorID)
+		subject := "New post"
+		HTMLBody := "<h1>New post</h1>"
+		TextBody := newPost.Description
+		CharSet := "UTF-8"
+
+		err = email.SendEmail(recipient.Email, subject, HTMLBody, TextBody, CharSet)
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
