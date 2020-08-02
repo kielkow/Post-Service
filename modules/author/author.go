@@ -11,6 +11,7 @@ type Author struct {
 	LastName  string    `json:"lastname"`
 	Email     string    `json:"email"`
 	Avatar    *string   `json:"avatar"`
+	AvatarURL *string   `json:"avatarUrl"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }

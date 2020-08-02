@@ -3,8 +3,10 @@ package post
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -51,6 +53,22 @@ func getPost(id int) (*Post, error) {
 		&post.CreatedAt,
 		&post.UpdatedAt,
 	)
+
+	if post.Author.Avatar != nil {
+		avatarnameJSON, err := json.Marshal(post.Author.Avatar)
+
+		if err != nil {
+			fmt.Print(err)
+			return nil, err
+		}
+
+		avatarname := string(avatarnameJSON[:])
+
+		url := "https://" + os.Getenv("AWS_S3_BUCKET") + ".s3.amazonaws.com/" + avatarname
+		url = strings.ReplaceAll(url, string('"'), "")
+
+		post.Author.AvatarURL = &url
+	}
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -127,6 +145,22 @@ func getPostList() ([]Post, error) {
 			&post.CreatedAt,
 			&post.UpdatedAt,
 		)
+
+		if post.Author.Avatar != nil {
+			avatarnameJSON, err := json.Marshal(post.Author.Avatar)
+	
+			if err != nil {
+				fmt.Print(err)
+				return nil, err
+			}
+	
+			avatarname := string(avatarnameJSON[:])
+	
+			url := "https://" + os.Getenv("AWS_S3_BUCKET") + ".s3.amazonaws.com/" + avatarname
+			url = strings.ReplaceAll(url, string('"'), "")
+	
+			post.Author.AvatarURL = &url
+		}
 
 		posts = append(posts, post)
 	}
@@ -237,6 +271,22 @@ func getToptenPosts() ([]Post, error) {
 			&post.UpdatedAt,
 		)
 
+		if post.Author.Avatar != nil {
+			avatarnameJSON, err := json.Marshal(post.Author.Avatar)
+	
+			if err != nil {
+				fmt.Print(err)
+				return nil, err
+			}
+	
+			avatarname := string(avatarnameJSON[:])
+	
+			url := "https://" + os.Getenv("AWS_S3_BUCKET") + ".s3.amazonaws.com/" + avatarname
+			url = strings.ReplaceAll(url, string('"'), "")
+	
+			post.Author.AvatarURL = &url
+		}
+
 		posts = append(posts, post)
 	}
 
@@ -309,6 +359,22 @@ func searchPostData(postFilter ReportFilter) ([]Post, error) {
 			&post.CreatedAt,
 			&post.UpdatedAt,
 		)
+
+		if post.Author.Avatar != nil {
+			avatarnameJSON, err := json.Marshal(post.Author.Avatar)
+	
+			if err != nil {
+				fmt.Print(err)
+				return nil, err
+			}
+	
+			avatarname := string(avatarnameJSON[:])
+	
+			url := "https://" + os.Getenv("AWS_S3_BUCKET") + ".s3.amazonaws.com/" + avatarname
+			url = strings.ReplaceAll(url, string('"'), "")
+	
+			post.Author.AvatarURL = &url
+		}
 
 		posts = append(posts, post)
 	}

@@ -3,8 +3,10 @@ package author
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -52,6 +54,22 @@ func GetAuthor(id int) (*Author, error) {
 	} else if err != nil {
 		fmt.Print(err)
 		return nil, err
+	}
+
+	if author.Avatar != nil {
+		avatarnameJSON, err := json.Marshal(author.Avatar)
+
+		if err != nil {
+			fmt.Print(err)
+			return nil, err
+		}
+
+		avatarname := string(avatarnameJSON[:])
+
+		url := "https://" + os.Getenv("AWS_S3_BUCKET") + ".s3.amazonaws.com/" + avatarname
+		url = strings.ReplaceAll(url, string('"'), "")
+
+		author.AvatarURL = &url
 	}
 
 	return author, nil
@@ -115,6 +133,22 @@ func getAuthorList() ([]Author, error) {
 			&author.CreatedAt,
 			&author.UpdatedAt,
 		)
+
+		if author.Avatar != nil {
+			avatarnameJSON, err := json.Marshal(author.Avatar)
+
+			if err != nil {
+				fmt.Print(err)
+				return nil, err
+			}
+
+			avatarname := string(avatarnameJSON[:])
+
+			url := "https://" + os.Getenv("AWS_S3_BUCKET") + ".s3.amazonaws.com/" + avatarname
+			url = strings.ReplaceAll(url, string('"'), "")
+
+			author.AvatarURL = &url
+		}
 
 		authors = append(authors, author)
 	}
@@ -224,6 +258,22 @@ func getToptenAuthors() ([]Author, error) {
 			&author.UpdatedAt,
 		)
 
+		if author.Avatar != nil {
+			avatarnameJSON, err := json.Marshal(author.Avatar)
+
+			if err != nil {
+				fmt.Print(err)
+				return nil, err
+			}
+
+			avatarname := string(avatarnameJSON[:])
+
+			url := "https://" + os.Getenv("AWS_S3_BUCKET") + ".s3.amazonaws.com/" + avatarname
+			url = strings.ReplaceAll(url, string('"'), "")
+
+			author.AvatarURL = &url
+		}
+
 		authors = append(authors, author)
 	}
 
@@ -238,7 +288,7 @@ func searchAuthorData(authorFilter ReportFilter) ([]Author, error) {
 	var queryBuilder strings.Builder
 
 	queryBuilder.WriteString(
-	 `SELECT
+		`SELECT
 			authors.id,
 			firstname,
 			lastname,
@@ -290,6 +340,22 @@ func searchAuthorData(authorFilter ReportFilter) ([]Author, error) {
 			&author.CreatedAt,
 			&author.UpdatedAt,
 		)
+
+		if author.Avatar != nil {
+			avatarnameJSON, err := json.Marshal(author.Avatar)
+
+			if err != nil {
+				fmt.Print(err)
+				return nil, err
+			}
+
+			avatarname := string(avatarnameJSON[:])
+
+			url := "https://" + os.Getenv("AWS_S3_BUCKET") + ".s3.amazonaws.com/" + avatarname
+			url = strings.ReplaceAll(url, string('"'), "")
+
+			author.AvatarURL = &url
+		}
 
 		authors = append(authors, author)
 	}
