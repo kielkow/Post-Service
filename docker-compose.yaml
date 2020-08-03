@@ -4,7 +4,15 @@ services:
   app:
     build: .
     container_name: app
-    entrypoint: dockerize -wait tcp://db:3306 -timeout 40s ./.docker/entrypoint.sh
+    entrypoint: dockerize -template ./.docker/app/.env:.env -wait tcp://db:3306 -timeout 40s ./.docker/entrypoint.sh
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=mysql
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - AWS_S3_REGION=aws-region
+      - AWS_S3_BUCKET=mybucket
+      - AWS_SES_SENDER=example@example.com
     volumes:
       - .:/home/go/api
     networks: 
