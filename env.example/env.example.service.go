@@ -17,4 +17,6 @@ func SetEnv() {
 	os.Setenv("AWS_S3_BUCKET", "example-bucket")
 
 	os.Setenv("AWS_SES_SENDER", "example@example.com")
+
+	os.Setenv("JWT_APP_SECRET", "mysupersecretphrase")
 }
