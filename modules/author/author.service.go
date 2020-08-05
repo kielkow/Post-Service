@@ -16,6 +16,7 @@ import (
 	"github.com/kielkow/Post-Service/shared/http/cors"
 	"github.com/kielkow/Post-Service/shared/providers/apperror"
 	"github.com/kielkow/Post-Service/shared/providers/storage"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const authorsBasePath = "authors"
@@ -83,6 +84,19 @@ func authorsHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write(error)
 			return
 		}
+
+		password, err := json.Marshal(newAuthor.Password)
+		hashPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		newAuthor.Password = string(hashPassword)
 
 		_, err = insertAuthor(newAuthor)
 

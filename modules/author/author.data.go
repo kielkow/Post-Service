@@ -191,12 +191,14 @@ func insertAuthor(newAuthor CreateAuthor) (int, error) {
 			(
 				firstname, 
 				lastname,
-				email 
+				email,
+				password
 			) 
-		VALUES (?, ?, ?)`,
+		VALUES (?, ?, ?, ?)`,
 		newAuthor.FirstName,
 		newAuthor.LastName,
 		newAuthor.Email,
+		newAuthor.Password,
 	)
 
 	if err != nil {
