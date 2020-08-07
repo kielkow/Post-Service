@@ -13,13 +13,13 @@ import (
 var mySigningKey = []byte(os.Getenv("JWT_APP_SECRET"))
 
 // GenerateJWT func
-func GenerateJWT(authorName string) (string, error) {
+func GenerateJWT(authorEmail string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["authorized"] = true
-	claims["user"] = authorName
+	claims["user"] = authorEmail
 	claims["exp"] = time.Now().Add(time.Minute * 2880).Unix()
 
 	tokenString, err := token.SignedString(mySigningKey)
