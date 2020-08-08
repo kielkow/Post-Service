@@ -36,13 +36,12 @@ func GenerateJWT(authorEmail string) (string, error) {
 func IsAuthorized(endpoint func(http.ResponseWriter, *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header["Token"] != nil {
-			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, err) {
+			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					error := apperror.GenerateError(500, "There was an error on JWT authenticaction")
 
 					w.WriteHeader(http.StatusInternalServerError)
 					w.Write(error)
-					return
 				}
 
 				return mySigningKey, nil
@@ -53,19 +52,16 @@ func IsAuthorized(endpoint func(http.ResponseWriter, *http.Request)) http.Handle
 
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write(error)
-				return
 			}
 
 			if token.Valid {
 				endpoint(w, r)
 			}
-		}
-		else {
+		} else {
 			error := apperror.GenerateError(403, "Not Authorized")
 
 			w.WriteHeader(http.StatusNonAuthoritativeInfo)
 			w.Write(error)
-			return
 		}
 	})
 }
