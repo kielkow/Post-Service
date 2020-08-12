@@ -11,6 +11,7 @@ import (
 	"github.com/kielkow/Post-Service/modules/author"
 	"github.com/kielkow/Post-Service/shared/http/cors"
 	"github.com/kielkow/Post-Service/shared/providers/apperror"
+	"github.com/kielkow/Post-Service/shared/providers/authentication"
 	"github.com/kielkow/Post-Service/shared/providers/email"
 )
 
@@ -20,13 +21,11 @@ const postsBasePath = "posts"
 func SetupRoutes(apiBasePath string) {
 	handlePosts := http.HandlerFunc(postsHandler)
 	handlePost := http.HandlerFunc(postHandler)
-
 	reportHandler := http.HandlerFunc(handlePostReport)
 
-	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, postsBasePath), cors.Middleware(handlePosts))
-	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, postsBasePath), cors.Middleware(handlePost))
-
-	http.Handle(fmt.Sprintf("%s/%s/reports", apiBasePath, postsBasePath), cors.Middleware(reportHandler))
+	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, postsBasePath), cors.Middleware(authentication.IsAuthorized(handlePosts)))
+	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, postsBasePath), cors.Middleware(authentication.IsAuthorized(handlePost)))
+	http.Handle(fmt.Sprintf("%s/%s/reports", apiBasePath, postsBasePath), cors.Middleware(authentication.IsAuthorized(reportHandler)))
 }
 
 func postsHandler(w http.ResponseWriter, r *http.Request) {
@@ -165,7 +164,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
-	
+
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(error)
 			return
@@ -181,7 +180,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			error := apperror.GenerateError(400, err.Error())
-	
+
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write(error)
 			return
@@ -191,7 +190,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			error := apperror.GenerateError(400, err.Error())
-	
+
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write(error)
 			return
@@ -201,7 +200,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
-	
+
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(error)
 			return
@@ -209,7 +208,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 		if authorExists == nil {
 			error := apperror.GenerateError(404, "Author not found")
-	
+
 			w.WriteHeader(http.StatusNotFound)
 			w.Write(error)
 			return
@@ -219,7 +218,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
-	
+
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(error)
 			return
@@ -233,7 +232,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
-	
+
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(error)
 			return

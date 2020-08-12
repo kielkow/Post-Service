@@ -15,6 +15,7 @@ import (
 
 	"github.com/kielkow/Post-Service/shared/http/cors"
 	"github.com/kielkow/Post-Service/shared/providers/apperror"
+	"github.com/kielkow/Post-Service/shared/providers/authentication"
 	"github.com/kielkow/Post-Service/shared/providers/hasher"
 	"github.com/kielkow/Post-Service/shared/providers/storage"
 )
@@ -28,13 +29,11 @@ var ReceiptDirectory string = filepath.Join("uploads")
 func SetupRoutes(apiBasePath string) {
 	handleAuthors := http.HandlerFunc(authorsHandler)
 	handleAuthor := http.HandlerFunc(authorHandler)
-
 	reportHandler := http.HandlerFunc(handleAuthorReport)
-
-	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, authorsBasePath), cors.Middleware(handleAuthors))
-	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, authorsBasePath), cors.Middleware(handleAuthor))
-
-	http.Handle(fmt.Sprintf("%s/%s/reports", apiBasePath, authorsBasePath), cors.Middleware(reportHandler))
+	
+	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, authorsBasePath), cors.Middleware(authentication.IsAuthorized(handleAuthors)))
+	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, authorsBasePath), cors.Middleware(authentication.IsAuthorized(handleAuthor)))
+	http.Handle(fmt.Sprintf("%s/%s/reports", apiBasePath, authorsBasePath), cors.Middleware(authentication.IsAuthorized(reportHandler)))
 }
 
 func authorsHandler(w http.ResponseWriter, r *http.Request) {
