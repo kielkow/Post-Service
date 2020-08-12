@@ -27,41 +27,19 @@ var ReceiptDirectory string = filepath.Join("uploads")
 
 // SetupRoutes function
 func SetupRoutes(apiBasePath string) {
+	handleCreate := http.HandlerFunc(authorCreate)
 	handleAuthors := http.HandlerFunc(authorsHandler)
 	handleAuthor := http.HandlerFunc(authorHandler)
 	reportHandler := http.HandlerFunc(handleAuthorReport)
-	
+
+	http.Handle(fmt.Sprintf("%s/%s/create", apiBasePath, authorsBasePath), cors.Middleware(handleCreate))
 	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, authorsBasePath), cors.Middleware(authentication.IsAuthorized(handleAuthors)))
 	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, authorsBasePath), cors.Middleware(authentication.IsAuthorized(handleAuthor)))
 	http.Handle(fmt.Sprintf("%s/%s/reports", apiBasePath, authorsBasePath), cors.Middleware(authentication.IsAuthorized(reportHandler)))
 }
 
-func authorsHandler(w http.ResponseWriter, r *http.Request) {
+func authorCreate(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodGet:
-		authorList, err := getAuthorList()
-
-		if err != nil {
-			error := apperror.GenerateError(500, err.Error())
-
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(error)
-			return
-		}
-
-		authorsJSON, err := json.Marshal(authorList)
-
-		if err != nil {
-			error := apperror.GenerateError(500, err.Error())
-
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(error)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(authorsJSON)
-
 	case http.MethodPost:
 		var newAuthor CreateAuthor
 		bodyBytes, err := ioutil.ReadAll(r.Body)
@@ -109,6 +87,37 @@ func authorsHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusCreated)
 		return
+
+	case http.MethodOptions:
+		return
+	}
+}
+
+func authorsHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		authorList, err := getAuthorList()
+
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		authorsJSON, err := json.Marshal(authorList)
+
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(authorsJSON)
 
 	case http.MethodOptions:
 		return
