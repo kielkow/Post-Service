@@ -58,7 +58,7 @@ func IsAuthorized(endpoint func(http.ResponseWriter, *http.Request)) http.Handle
 				endpoint(w, r)
 			}
 		} else {
-			error := apperror.GenerateError(403, "Not Authorized")
+			error := apperror.GenerateError(401, "Incorrect e-mail/password combination")
 
 			w.WriteHeader(http.StatusNonAuthoritativeInfo)
 			w.Write(error)
