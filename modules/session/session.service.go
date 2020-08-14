@@ -58,7 +58,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 		match := hasher.CheckPasswordHash(session.Password, passwordHashed)
 
 		if match == false {
-			error := apperror.GenerateError(403, "Incorret credentials")
+			error := apperror.GenerateError(401, "Incorrect e-mail/password combination")
 
 			w.WriteHeader(http.StatusNonAuthoritativeInfo)
 			w.Write(error)
