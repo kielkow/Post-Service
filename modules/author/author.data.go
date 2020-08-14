@@ -412,3 +412,32 @@ func removeAvatar(avatar string) error {
 
 	return nil
 }
+
+func getAuthorByEmail(email string) (*string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	row := database.DbConn.QueryRowContext(
+		ctx,
+		`SELECT 
+			email
+		FROM
+			authors
+		WHERE
+			email = ?;`,
+		email,
+	)
+
+	var authorEmail *string
+
+	err := row.Scan(&authorEmail)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		fmt.Print(err)
+		return nil, err
+	}
+
+	return authorEmail, nil
+}

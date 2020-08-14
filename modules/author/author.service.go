@@ -62,6 +62,24 @@ func authorCreate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		authorExists, err := getAuthorByEmail(newAuthor.Email)
+
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		if authorExists != nil {
+			error := apperror.GenerateError(404, "Author already exists")
+
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(error)
+			return
+		}
+
 		password, err := json.Marshal(newAuthor.Password)
 		hashedPassword, err := hasher.HashPassword(string(password))
 
