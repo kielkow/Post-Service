@@ -13,6 +13,7 @@ services:
       - AWS_S3_REGION=aws-region
       - AWS_S3_BUCKET=mybucket
       - AWS_SES_SENDER=example@example.com
+      - JWT_APP_SECRET=mysupersecretphrase
     volumes:
       - .:/home/go/api
     networks: 
