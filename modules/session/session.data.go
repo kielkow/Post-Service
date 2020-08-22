@@ -9,7 +9,7 @@ import (
 	"github.com/kielkow/Post-Service/shared/database"
 )
 
-func getPassword(email string) (string, error) {
+func getPassword(email string) (*Token, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -22,16 +22,16 @@ func getPassword(email string) (string, error) {
 		email,
 	)
 
-	var password string
+	token := &Token{}
 
-	err := row.Scan(&password)
+	err := row.Scan(&token.Token)
 
 	if err == sql.ErrNoRows {
-		return "", err
+		return nil, nil
 	} else if err != nil {
 		fmt.Print(err)
-		return "", err
+		return nil, err
 	}
 
-	return password, nil
+	return token, nil
 }

@@ -55,7 +55,7 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		match := hasher.CheckPasswordHash(session.Password, passwordHashed)
+		match := hasher.CheckPasswordHash(session.Password, passwordHashed.Token)
 
 		if match == false {
 			error := apperror.GenerateError(401, "Incorrect e-mail/password combination")
@@ -65,9 +65,20 @@ func postsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		token, err := authentication.GenerateJWT(session.Email)
+		tokenString, err := authentication.GenerateJWT(session.Email)
 
-		tokenJSON, err := json.Marshal(token)
+		if err != nil {
+			error := apperror.GenerateError(500, err.Error())
+
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(error)
+			return
+		}
+
+		var tokenJWT Token
+		tokenJWT.Token = tokenString
+
+		tokenJSON, err := json.Marshal(tokenJWT)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(tokenJSON)
