@@ -80,8 +80,7 @@ func authorCreate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		password, err := json.Marshal(newAuthor.Password)
-		hashedPassword, err := hasher.HashPassword(string(password))
+		hashedPassword, err := hasher.HashPassword(newAuthor.Password)
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())
