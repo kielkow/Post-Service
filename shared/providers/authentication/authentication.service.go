@@ -48,10 +48,11 @@ func IsAuthorized(endpoint func(http.ResponseWriter, *http.Request)) http.Handle
 			})
 
 			if err != nil {
-				error := apperror.GenerateError(500, err.Error())
+				error := apperror.GenerateError(401, err.Error())
 
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write(error)
+				return
 			}
 
 			if token.Valid {
