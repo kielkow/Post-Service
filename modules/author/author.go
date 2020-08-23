@@ -24,6 +24,15 @@ type CreateAuthor struct {
 	Password  string `json:"password"`
 }
 
+// UpdateAuthor struct
+type UpdateAuthor struct {
+	FirstName       string `json:"firstname"`
+	LastName        string `json:"lastname"`
+	Email           string `json:"email"`
+	Password        string `json:"password"`
+	ConfirmPassword string `json:"confirmPassword"`
+}
+
 // CreateAuthorAvatar struct
 type CreateAuthorAvatar struct {
 	AuthorID int    `json:"authorId"`

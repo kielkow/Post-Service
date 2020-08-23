@@ -187,7 +187,7 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(authorJSON)
 
 	case http.MethodPut:
-		var updatedAuthor Author
+		var updatedAuthor UpdateAuthor
 
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 
@@ -209,7 +209,31 @@ func authorHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = updateAuthor(id, updatedAuthor)
+		if updatedAuthor.Password != "" {
+			if updatedAuthor.ConfirmPassword != updatedAuthor.Password {
+				error := apperror.GenerateError(400, "Confirm password must be equal like password")
+
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(error)
+				return
+			}
+
+			hashedPassword, err := hasher.HashPassword(updatedAuthor.Password)
+
+			if err != nil {
+				error := apperror.GenerateError(500, err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(error)
+				return
+			}
+
+			updatedAuthor.Password = hashedPassword
+
+			err = updateAuthor(id, updatedAuthor)
+		} else {
+			err = updateAuthor(id, updatedAuthor)
+		}
 
 		if err != nil {
 			error := apperror.GenerateError(500, err.Error())

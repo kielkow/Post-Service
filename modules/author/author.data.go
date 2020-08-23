@@ -156,26 +156,48 @@ func getAuthorList() ([]Author, error) {
 	return authors, nil
 }
 
-func updateAuthor(id int, author Author) error {
+func updateAuthor(id int, author UpdateAuthor) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	_, err := database.DbConn.ExecContext(
-		ctx,
-		`UPDATE authors SET 
-			firstname = ?, 
-			lastname = ?, 
-			email = ? 
-		WHERE id = ? `,
-		&author.FirstName,
-		&author.LastName,
-		&author.Email,
-		id,
-	)
+	if author.Password != "" {
+		_, err := database.DbConn.ExecContext(
+			ctx,
+			`UPDATE authors SET 
+				firstname = ?, 
+				lastname = ?, 
+				email = ?,
+				password = ?
+			WHERE id = ? `,
+			&author.FirstName,
+			&author.LastName,
+			&author.Email,
+			&author.Password,
+			id,
+		)
 
-	if err != nil {
-		fmt.Print(err)
-		return err
+		if err != nil {
+			fmt.Print(err)
+			return err
+		}
+	} else {
+		_, err := database.DbConn.ExecContext(
+			ctx,
+			`UPDATE authors SET 
+				firstname = ?, 
+				lastname = ?, 
+				email = ?
+			WHERE id = ? `,
+			&author.FirstName,
+			&author.LastName,
+			&author.Email,
+			id,
+		)
+
+		if err != nil {
+			fmt.Print(err)
+			return err
+		}
 	}
 
 	return nil
